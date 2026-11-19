@@ -841,7 +841,7 @@
   let suppressNextClick = false;
 
   function isHardInteractive(el) {
-    return Boolean(el.closest("a, button, video"));
+    return Boolean(el.closest("a, button, video, [data-jump], [data-lightbox]"));
   }
 
   spreadEl?.addEventListener("pointerdown", (e) => {
