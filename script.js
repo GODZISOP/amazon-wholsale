@@ -841,7 +841,7 @@
   let suppressNextClick = false;
 
   function isHardInteractive(el) {
-    return Boolean(el.closest("a, button, video, [data-jump], [data-lightbox]"));
+    return Boolean(el.closest("a, button, video, [data-jump], [data-lightbox], img"));
   }
 
   spreadEl?.addEventListener("pointerdown", (e) => {
@@ -1096,6 +1096,11 @@
     const trigger = e.target.closest("[data-lightbox]");
     if (trigger) {
       openLightbox(trigger.dataset.lightbox, trigger.dataset.caption);
+      return;
+    }
+    const imgEl = e.target.closest("#book-spread img");
+    if (imgEl && isBookOpen) {
+      openLightbox(imgEl.getAttribute("src"), imgEl.getAttribute("alt") || "Image Preview");
     }
   });
 
