@@ -1020,23 +1020,27 @@
     if (e.key === "ArrowLeft") goToSpread(currentIndex - 1);
   });
 
-  // Mobile swipe
+  // Mobile swipe (1-page-at-a-time 3D flip)
   let touchStartX = 0;
   spreadEl?.addEventListener(
     "touchstart",
     (e) => {
-      if (window.innerWidth <= 960) touchStartX = e.changedTouches[0].clientX;
+      if (isMobile()) touchStartX = e.changedTouches[0].clientX;
     },
     { passive: true }
   );
   spreadEl?.addEventListener(
     "touchend",
     (e) => {
-      if (window.innerWidth > 960) return;
+      if (!isMobile() || isHardInteractive(e.target)) return;
       const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 55) {
-        if (dx < 0) goToSpread(currentIndex + 1);
-        else goToSpread(currentIndex - 1);
+      if (Math.abs(dx) > 45) {
+        if (!isBookOpen) {
+          if (dx < 0) openBook(0);
+          return;
+        }
+        if (dx < 0) goToMobilePage(mobilePageIndex + 1);
+        else goToMobilePage(mobilePageIndex - 1);
       }
     },
     { passive: true }
