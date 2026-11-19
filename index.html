@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMZ WORK — Amazon Portfolio Book</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css?v=9" />
+</head>
+<body>
+  <div class="studio-desk">
+    <!-- TOP BAR -->
+    <header class="desk-topbar">
+      <div class="topbar-brand">
+        <span class="dot-red"></span>
+        <span>AMZ PORTFOLIO</span>
+      </div>
+
+      <nav class="chapter-nav" id="chapter-nav" aria-label="Book Chapters"></nav>
+
+      <div class="topbar-controls">
+        <button class="sound-toggle" id="tutorial-toggle" aria-label="Show guide">? GUIDE</button>
+        <button class="sound-toggle" id="sound-toggle" aria-pressed="true">🔊 SOUND: ON</button>
+        <div class="topbar-hint">DRAG PAGE OR USE ← →</div>
+      </div>
+    </header>
+
+    <!-- 3D BOOK STAGE -->
+    <main class="book-stage">
+      <button class="nav-arrow nav-prev" id="prev-btn" aria-label="Previous Spread">
+        <span>←</span>
+      </button>
+
+      <div class="book-wrapper" id="book-wrapper">
+        <!-- UNIFIED 3D BOOK (CLOSED COVER -> OPEN SPREADS) -->
+        <div class="book-cover-rim is-closed" id="open-book-rim">
+          <div class="book-spine-shadow" aria-hidden="true"></div>
+          <div class="book-spread" id="book-spread"></div>
+          <!-- 3D Flip Leaf Overlay (also acts as Front Cover when closed) -->
+          <div class="flip-leaf" id="flip-leaf" aria-hidden="true">
+            <div class="flip-face flip-front"></div>
+            <div class="flip-face flip-back"></div>
+          </div>
+        </div>
+
+        <!-- USER TUTORIAL GUIDE -->
+        <div class="tutorial-bar" id="tutorial-bar">
+          <div class="tut-steps">
+            <div class="tut-step"><strong>1. OPEN:</strong> Click or drag the cover to open the book</div>
+            <div class="tut-step"><strong>2. FLIP:</strong> Grab &amp; hold any page corner (or use ← → keys)</div>
+            <div class="tut-step"><strong>3. ZOOM:</strong> Click any dashboard or product image</div>
+          </div>
+          <button class="tut-close" id="tut-close" aria-label="Hide guide">GOT IT ✕</button>
+        </div>
+      </div>
+
+      <button class="nav-arrow nav-next" id="next-btn" aria-label="Next Spread">
+        <span>→</span>
+      </button>
+    </main>
+
+    <!-- BOTTOM CONTROLS -->
+    <footer class="desk-bottombar">
+      <button class="mobile-btn" id="mobile-prev">← PREV</button>
+      <div class="spread-counter" id="spread-counter">SPREAD 01 / 06</div>
+      <div class="progress-dots" id="progress-dots"></div>
+      <button class="mobile-btn" id="mobile-next">NEXT →</button>
+    </footer>
+  </div>
+
+  <!-- LIGHTBOX FOR SCREENSHOTS -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="Screenshot Preview">
+    <div class="lightbox-backdrop" id="lightbox-close-bg"></div>
+    <div class="lightbox-dialog">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close preview">✕</button>
+      <img src="" alt="" id="lightbox-img" />
+      <p class="lightbox-caption" id="lightbox-caption"></p>
+    </div>
+  </div>
+
+  <script src="data.js?v=9"></script>
+  <script src="script.js?v=9"></script>
+</body>
+</html>
