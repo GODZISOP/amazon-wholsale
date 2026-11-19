@@ -1,4 +1,4 @@
-image.png
-image copy*.png
+/image.png
+/image copy*.png
 .DS_Store
 Thumbs.db
