@@ -656,7 +656,7 @@
     }
     if (counterEl) {
       if (!isBookOpen) {
-        counterEl.textContent = "CLOSED COVER • CLICK OR DRAG TO OPEN";
+        counterEl.textContent = "CLOSED COVER • CLICK, TAP OR DRAG TO OPEN";
       } else if (isMobile()) {
         const pNum = String(mobilePageIndex + 1).padStart(2, "0");
         const pTotal = String(mobilePages.length).padStart(2, "0");
@@ -936,7 +936,13 @@
       return;
     }
 
-    if (!state.active) return;
+    // Simple click on an open page flips to next/prev (unless clicking zoom/jump/link)
+    if (!state.active) {
+      if (!e.target.closest("a, button, video, [data-lightbox], [data-jump]")) {
+        goToSpread(state.targetIndex);
+      }
+      return;
+    }
 
     // Prevent accidental lightbox/jump click after dragging
     suppressNextClick = true;
@@ -1020,12 +1026,16 @@
     if (e.key === "ArrowLeft") goToSpread(currentIndex - 1);
   });
 
-  // Mobile swipe (1-page-at-a-time 3D flip)
+  // Mobile swipe & tap-to-flip (1-page-at-a-time 3D flip)
   let touchStartX = 0;
+  let touchStartY = 0;
   spreadEl?.addEventListener(
     "touchstart",
     (e) => {
-      if (isMobile()) touchStartX = e.changedTouches[0].clientX;
+      if (isMobile()) {
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+      }
     },
     { passive: true }
   );
@@ -1034,13 +1044,26 @@
     (e) => {
       if (!isMobile() || isHardInteractive(e.target)) return;
       const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 45) {
+      const dy = e.changedTouches[0].clientY - touchStartY;
+
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
         if (!isBookOpen) {
           if (dx < 0) openBook(0);
           return;
         }
         if (dx < 0) goToMobilePage(mobilePageIndex + 1);
         else goToMobilePage(mobilePageIndex - 1);
+      } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+        if (!isBookOpen) {
+          openBook(0);
+          return;
+        }
+        if (!e.target.closest("[data-lightbox], [data-jump]")) {
+          const rect = spreadEl.getBoundingClientRect();
+          const relX = (e.changedTouches[0].clientX - rect.left) / rect.width;
+          if (relX < 0.35) goToMobilePage(mobilePageIndex - 1);
+          else goToMobilePage(mobilePageIndex + 1);
+        }
       }
     },
     { passive: true }
