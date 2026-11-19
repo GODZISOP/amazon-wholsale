@@ -179,7 +179,8 @@ body {
 
 .book-wrapper {
   width: 100%;
-  max-width: min(1080px, 92vw);
+  max-width: min(1140px, 92vw);
+  margin: 0 auto;
   perspective: 2200px;
 }
 
@@ -257,7 +258,7 @@ body {
 .book-spread {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: clamp(460px, 68vh, 600px);
+  min-height: clamp(470px, 70vh, 620px);
   position: relative;
   overflow: hidden;
   border-radius: 2px;
@@ -358,7 +359,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  min-height: clamp(460px, 68vh, 600px);
+  min-height: clamp(470px, 70vh, 620px);
 }
 
 .page-dark {
@@ -870,18 +871,36 @@ body {
   cursor: pointer;
 }
 
-/* ---------------- RESPONSIVE (TABLET & PHONE) ---------------- */
+/* ---------------- RESPONSIVE (TABLET & PHONE BOOK MODE) ---------------- */
 @media (max-width: 960px) {
   .studio-desk {
     padding: 10px 12px 16px;
     gap: 10px;
   }
+  .book-wrapper {
+    max-width: 520px;
+  }
   .book-spread {
     grid-template-columns: 1fr;
-    min-height: auto;
+    min-height: clamp(480px, 72dvh, 620px);
   }
-  .book-spread > .page + .page {
-    border-top: 3px solid var(--accent-red);
+  .page {
+    min-height: clamp(480px, 72dvh, 620px);
+    padding: 18px 18px 20px;
+  }
+  .flip-leaf {
+    left: 6px;
+    width: calc(100% - 12px);
+    transform-origin: left center;
+  }
+  .flip-leaf.dir-prev {
+    left: 6px;
+    transform-origin: left center;
+  }
+  .book-cover-rim.is-closed .book-spread > .page:first-child,
+  .book-cover-rim.is-opening-cover .book-spread > .page:first-child {
+    visibility: visible;
+    pointer-events: auto;
   }
   .book-spine-shadow,
   .nav-arrow,
@@ -889,10 +908,6 @@ body {
   .gold-badge,
   .corner-cue {
     display: none;
-  }
-  .page {
-    min-height: auto;
-    padding: 18px 18px 20px;
   }
   .mobile-btn {
     display: inline-block;

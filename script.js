@@ -77,7 +77,7 @@
 
       const gain = audioCtx.createGain();
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(mode === "peel" ? 0.16 : 0.32, now + 0.04);
+      gain.gain.linearRampToValueAtTime(mode === "peel" ? 0.52 : 0.95, now + 0.035);
       gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
       noise.connect(bandpass);
@@ -625,7 +625,14 @@
     }
   ];
 
+  const mobilePages = spreads.flatMap((s, idx) => [
+    { html: s.left, spreadIdx: idx },
+    { html: s.right, spreadIdx: idx }
+  ]);
+  const isMobile = () => window.innerWidth <= 960;
+
   let currentIndex = 0;
+  let mobilePageIndex = 0;
   let isAnimating = false;
 
   function renderNav() {
@@ -650,6 +657,10 @@
     if (counterEl) {
       if (!isBookOpen) {
         counterEl.textContent = "CLOSED COVER • CLICK OR DRAG TO OPEN";
+      } else if (isMobile()) {
+        const pNum = String(mobilePageIndex + 1).padStart(2, "0");
+        const pTotal = String(mobilePages.length).padStart(2, "0");
+        counterEl.textContent = `PAGE ${pNum} / ${pTotal}`;
       } else {
         const num = String(currentIndex + 1).padStart(2, "0");
         const total = String(spreads.length).padStart(2, "0");
@@ -662,11 +673,8 @@
     if (mobileNext) mobileNext.disabled = false;
   }
 
-  function renderSpread(index) {
-    const s = spreads[index];
-    if (!s || !spreadEl) return;
-    spreadEl.innerHTML = s.left + s.right;
-    const vid = spreadEl.querySelector("#book-video");
+  function bindVideoMute() {
+    const vid = spreadEl?.querySelector("#book-video");
     if (vid) {
       vid.muted = true;
       vid.volume = 0;
@@ -677,6 +685,22 @@
         }
       });
     }
+  }
+
+  function renderSpread(index) {
+    if (!spreadEl) return;
+    if (isMobile()) {
+      const mp = mobilePages[mobilePageIndex] || mobilePages[0];
+      currentIndex = mp.spreadIdx;
+      spreadEl.innerHTML = mp.html;
+    } else {
+      const s = spreads[index];
+      if (!s) return;
+      currentIndex = index;
+      mobilePageIndex = index * 2;
+      spreadEl.innerHTML = s.left + s.right;
+    }
+    bindVideoMute();
     renderNav();
   }
 
@@ -720,7 +744,64 @@
     isAnimating = false;
   }
 
+  function goToMobilePage(targetPage) {
+    if (!isBookOpen) {
+      openBook(Math.floor(Math.max(0, Math.min(mobilePages.length - 1, targetPage)) / 2));
+      return;
+    }
+    if (targetPage < 0 || targetPage >= mobilePages.length) {
+      closeBook();
+      return;
+    }
+    if (isAnimating || targetPage === mobilePageIndex) return;
+
+    const forward = targetPage > mobilePageIndex;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    playPageSound("flip");
+
+    if (!flipLeaf || !flipFront || !flipBack || reducedMotion) {
+      mobilePageIndex = targetPage;
+      renderSpread(mobilePages[mobilePageIndex].spreadIdx);
+      return;
+    }
+
+    isAnimating = true;
+    flipLeaf.classList.remove("dir-prev", "smooth-snap", "active");
+
+    if (forward) {
+      spreadEl.innerHTML = mobilePages[targetPage].html;
+      flipFront.innerHTML = mobilePages[mobilePageIndex].html;
+      flipBack.innerHTML = `<div class="page page-dark" style="opacity:0.9;"></div>`;
+      flipLeaf.style.transform = "rotateY(0deg)";
+      flipLeaf.classList.add("active");
+      void flipLeaf.offsetWidth;
+      flipLeaf.classList.add("smooth-snap");
+      flipLeaf.style.transform = "rotateY(-120deg)";
+    } else {
+      spreadEl.innerHTML = mobilePages[mobilePageIndex].html;
+      flipFront.innerHTML = mobilePages[targetPage].html;
+      flipBack.innerHTML = `<div class="page page-dark" style="opacity:0.9;"></div>`;
+      flipLeaf.style.transform = "rotateY(-120deg)";
+      flipLeaf.classList.add("active");
+      void flipLeaf.offsetWidth;
+      flipLeaf.classList.add("smooth-snap");
+      flipLeaf.style.transform = "rotateY(0deg)";
+    }
+
+    setTimeout(() => {
+      mobilePageIndex = targetPage;
+      flipLeaf.classList.remove("active", "smooth-snap");
+      flipLeaf.style.transform = "";
+      renderSpread(mobilePages[mobilePageIndex].spreadIdx);
+      isAnimating = false;
+    }, 420);
+  }
+
   function goToSpread(targetIndex) {
+    if (isMobile()) {
+      goToMobilePage(targetIndex * 2);
+      return;
+    }
     if (!isBookOpen) {
       openBook(Math.max(0, Math.min(spreads.length - 1, targetIndex)));
       return;
@@ -911,8 +992,18 @@
   // ---------------- CONTROLS & LIGHTBOX ----------------
   if (prevBtn) prevBtn.addEventListener("click", () => goToSpread(currentIndex - 1));
   if (nextBtn) nextBtn.addEventListener("click", () => (isBookOpen ? goToSpread(currentIndex + 1) : openBook(0)));
-  if (mobilePrev) mobilePrev.addEventListener("click", () => goToSpread(currentIndex - 1));
-  if (mobileNext) mobileNext.addEventListener("click", () => (isBookOpen ? goToSpread(currentIndex + 1) : openBook(0)));
+  if (mobilePrev) {
+    mobilePrev.addEventListener("click", () =>
+      isMobile() ? goToMobilePage(mobilePageIndex - 1) : goToSpread(currentIndex - 1)
+    );
+  }
+  if (mobileNext) {
+    mobileNext.addEventListener("click", () => {
+      if (!isBookOpen) openBook(0);
+      else if (isMobile()) goToMobilePage(mobilePageIndex + 1);
+      else goToSpread(currentIndex + 1);
+    });
+  }
 
   document.addEventListener("click", (e) => {
     if (suppressNextClick) return;
