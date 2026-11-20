@@ -112,7 +112,16 @@
         updated_at: new Date().toISOString()
       })
     });
-    if (!res.ok) throw new Error("Supabase save failed");
+    if (!res.ok) {
+      let detail = `HTTP ${res.status}`;
+      try {
+        const errJson = await res.json();
+        if (errJson.message || errJson.hint || errJson.error) {
+          detail = errJson.message || errJson.hint || errJson.error;
+        }
+      } catch (_) {}
+      throw new Error(`Supabase save failed (${detail})`);
+    }
     return true;
   }
 
