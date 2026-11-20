@@ -287,16 +287,18 @@
       `
     });
 
-    // Auto-Paginated Ad Sales Dashboards (max 2 per page -> 4 per spread)
-    const adChunks = chunkArray(data.adDashboards || [], 2);
-    for (let i = 0; i < adChunks.length; i += 2) {
-      const leftList = adChunks[i] || [];
-      const rightList = adChunks[i + 1] || [];
+    // Ad Sales Dashboards (Show 4 in spread + Show More button if > 4)
+    const allAds = data.adDashboards || [];
+    const adsInSpread = allAds.slice(0, 4);
+    const leftList = adsInSpread.slice(0, 2);
+    const rightList = adsInSpread.slice(2, 4);
+    const extraAds = allAds.length - 4;
+    if (allAds.length > 0) {
       const pL = String(spreads.length * 2 + 1).padStart(2, "0");
       const pR = String(spreads.length * 2 + 2).padStart(2, "0");
 
       const rightHtml =
-        rightList.length === 1 && leftList.length === 2 && adChunks.length === 2
+        rightList.length === 1 && leftList.length === 2
           ? `
             <div class="proof-shot-box" data-lightbox="${rightList[0].image}" data-caption="${rightList[0].title} — ${rightList[0].subtitle}">
               <img src="${rightList[0].image}" alt="${rightList[0].title}" />
@@ -316,9 +318,14 @@
           : `<h2 class="book-big-title" style="font-size: 1.9rem;">Live Performance</h2>
              <p class="plain-copy">Click any dashboard on the left page to zoom in and inspect full metrics.</p>`;
 
+      const showMoreAdsBtn =
+        extraAds > 0
+          ? `<button class="showmore-btn" data-showmore="ads">SHOW MORE (+${extraAds} MORE) →</button>`
+          : "";
+
       spreads.push({
-        label: i === 0 ? "Ad Sales" : `Ad Sales ${i / 2 + 1}`,
-        tocTitle: i === 0 ? "LIVE AD SALES DASHBOARDS" : null,
+        label: "Ad Sales",
+        tocTitle: "LIVE AD SALES DASHBOARDS",
         left: `
           <div class="page page-dark">
             <div class="page-header">
@@ -342,7 +349,7 @@
               <span>ACCOUNT &amp; PAYMENTS</span>
               <span>CLICK TO ZOOM</span>
             </div>
-            <div class="page-body">${rightHtml}</div>
+            <div class="page-body">${rightHtml}${showMoreAdsBtn}</div>
             <div class="page-footer">
               <span>5.0 FEEDBACK • HEALTHY STORE</span>
               <span>P. ${pR}</span>
@@ -352,17 +359,23 @@
       });
     }
 
-    // Auto-Paginated Products (max 3 per page -> 6 per spread)
-    const prodChunks = chunkArray(data.featuredProducts || [], 3);
-    for (let i = 0; i < prodChunks.length; i += 2) {
-      const leftProds = prodChunks[i] || [];
-      const rightProds = prodChunks[i + 1] || [];
+    // Products (Show 6 in spread + Show More button if > 6)
+    const allProds = data.featuredProducts || [];
+    const prodsInSpread = allProds.slice(0, 6);
+    const leftProds = prodsInSpread.slice(0, 3);
+    const rightProds = prodsInSpread.slice(3, 6);
+    const extraProds = allProds.length - 6;
+    if (allProds.length > 0) {
       const pL = String(spreads.length * 2 + 1).padStart(2, "0");
       const pR = String(spreads.length * 2 + 2).padStart(2, "0");
+      const showMoreProdsBtn =
+        extraProds > 0
+          ? `<button class="showmore-btn" data-showmore="products">SHOW MORE (+${extraProds} MORE) →</button>`
+          : "";
 
       spreads.push({
-        label: i === 0 ? "Products" : `Products ${i / 2 + 1}`,
-        tocTitle: i === 0 ? `REAL PRODUCTS (${(data.featuredProducts || []).length})` : null,
+        label: "Products",
+        tocTitle: `REAL PRODUCTS (${allProds.length})`,
         left: `
           <div class="page page-dark">
             <div class="page-header">
@@ -393,8 +406,9 @@
               ${
                 rightProds.length > 0
                   ? `<div class="product-book-grid">${renderProductCards(rightProds)}</div>`
-                  : `<p class="plain-copy">More products can be added anytime from the Admin Panel — new pages will auto-align.</p>`
+                  : `<p class="plain-copy">More products can be added anytime from the Admin Panel.</p>`
               }
+              ${showMoreProdsBtn}
             </div>
             <div class="page-footer">
               <span>VERIFIED LISTINGS</span>
@@ -405,17 +419,23 @@
       });
     }
 
-    // Auto-Paginated Warehouse & Inventory (max 2 per page -> 4 per spread)
-    const invChunks = chunkArray(data.inventory || [], 2);
-    for (let i = 0; i < invChunks.length; i += 2) {
-      const leftInv = invChunks[i] || [];
-      const rightInv = invChunks[i + 1] || [];
+    // Warehouse & Inventory (Show 4 in spread + Show More button if > 4)
+    const allInv = data.inventory || [];
+    const invInSpread = allInv.slice(0, 4);
+    const leftInv = invInSpread.slice(0, 2);
+    const rightInv = invInSpread.slice(2, 4);
+    const extraInv = allInv.length - 4;
+    if (allInv.length > 0) {
       const pL = String(spreads.length * 2 + 1).padStart(2, "0");
       const pR = String(spreads.length * 2 + 2).padStart(2, "0");
+      const showMoreInvBtn =
+        extraInv > 0
+          ? `<button class="showmore-btn" data-showmore="inventory">SHOW MORE (+${extraInv} MORE) →</button>`
+          : "";
 
       spreads.push({
-        label: i === 0 ? "Inventory" : `Inventory ${i / 2 + 1}`,
-        tocTitle: i === 0 ? "WAREHOUSE & INVENTORY" : null,
+        label: "Inventory",
+        tocTitle: "WAREHOUSE & INVENTORY",
         left: `
           <div class="page page-dark">
             <div class="page-header">
@@ -448,6 +468,7 @@
                   ? `<div class="inv-grid">${renderInvCards(rightInv)}</div>`
                   : `<p class="plain-copy">Additional warehouse photos added via Admin Panel will appear here.</p>`
               }
+              ${showMoreInvBtn}
             </div>
             <div class="page-footer">
               <span>FNSKU LABELED • FBA READY</span>
@@ -952,7 +973,7 @@
   let suppressNextClick = false;
 
   function isHardInteractive(el) {
-    return Boolean(el.closest("a, button, video, [data-jump], [data-lightbox], img"));
+    return Boolean(el.closest("a, button, video, [data-jump], [data-lightbox], [data-showmore], img"));
   }
 
   spreadEl?.addEventListener("pointerdown", (e) => {
@@ -1210,8 +1231,51 @@
 
   if (lbClose) lbClose.addEventListener("click", closeLightbox);
   if (lbBg) lbBg.addEventListener("click", closeLightbox);
+
+  // Show More Modal
+  const showMoreModal = document.getElementById("showmore-modal");
+  const showMoreTitle = document.getElementById("showmore-title");
+  const showMoreBody = document.getElementById("showmore-body");
+  const showMoreClose = document.getElementById("showmore-close");
+  const showMoreBg = document.getElementById("showmore-close-bg");
+
+  function openShowMore(kind) {
+    if (!showMoreModal || !showMoreBody || !showMoreTitle) return;
+    if (kind === "ads") {
+      showMoreTitle.textContent = `ALL AD SALES DASHBOARDS (${(activeData.adDashboards || []).length})`;
+      showMoreBody.innerHTML = (activeData.adDashboards || []).map(renderAdsDashCard).join("");
+    } else if (kind === "products") {
+      showMoreTitle.textContent = `ALL PRODUCTS (${(activeData.featuredProducts || []).length})`;
+      showMoreBody.innerHTML = renderProductCards(activeData.featuredProducts || []);
+    } else if (kind === "inventory") {
+      showMoreTitle.textContent = `ALL WAREHOUSE & INVENTORY (${(activeData.inventory || []).length})`;
+      showMoreBody.innerHTML = renderInvCards(activeData.inventory || []);
+    }
+    showMoreModal.classList.add("open");
+    showMoreModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeShowMore() {
+    if (!showMoreModal) return;
+    showMoreModal.classList.remove("open");
+    showMoreModal.setAttribute("aria-hidden", "true");
+  }
+
+  document.addEventListener("click", (e) => {
+    const smBtn = e.target.closest("[data-showmore]");
+    if (smBtn) {
+      openShowMore(smBtn.dataset.showmore);
+    }
+  });
+
+  if (showMoreClose) showMoreClose.addEventListener("click", closeShowMore);
+  if (showMoreBg) showMoreBg.addEventListener("click", closeShowMore);
+
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeLightbox();
+    if (e.key === "Escape") {
+      closeLightbox();
+      closeShowMore();
+    }
   });
 
   function getFrontCoverHtml() {
@@ -1293,6 +1357,37 @@
   }
   if (tutorialToggle && tutorialBar) {
     tutorialToggle.addEventListener("click", () => tutorialBar.classList.toggle("is-hidden"));
+  }
+
+  // Sync from Supabase if configured
+  async function syncFromSupabase() {
+    let cfg = window.SUPABASE_CONFIG || {};
+    try {
+      const localCfg = localStorage.getItem("amz_supabase_config");
+      if (localCfg) cfg = Object.assign({}, cfg, JSON.parse(localCfg));
+    } catch (_) {}
+
+    if (!cfg.url || !cfg.anonKey) return;
+    try {
+      const endpoint = `${cfg.url.replace(/\/$/, "")}/rest/v1/${cfg.table || "portfolio_config"}?id=eq.${cfg.rowId || "main"}&select=data`;
+      const res = await fetch(endpoint, {
+        headers: window.getSupabaseHeaders
+          ? window.getSupabaseHeaders(cfg.anonKey)
+          : { apikey: cfg.anonKey }
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (rows && rows[0] && rows[0].data) {
+        activeData = Object.assign({}, window.PORTFOLIO_DATA, rows[0].data);
+        spreads = buildBook(activeData);
+        mobilePages = spreads.flatMap((s, idx) => [
+          { html: s.left, spreadIdx: idx },
+          { html: s.right, spreadIdx: idx }
+        ]);
+        if (!isBookOpen) showClosedState();
+        else renderSpread(Math.min(currentIndex, spreads.length - 1));
+      }
+    } catch (_) {}
   }
 
   // Sync from Supabase if configured

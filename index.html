@@ -10,7 +10,7 @@
     href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css?v=15" />
+  <link rel="stylesheet" href="styles.css?v=16" />
 </head>
 <body>
   <div class="studio-desk">
@@ -83,8 +83,21 @@
     </div>
   </div>
 
-  <script src="supabase-config.js?v=15"></script>
-  <script src="data.js?v=15"></script>
-  <script src="script.js?v=15"></script>
+  <!-- SHOW MORE MODAL -->
+  <div class="lightbox" id="showmore-modal" aria-hidden="true" role="dialog" aria-label="All Items">
+    <div class="lightbox-backdrop" id="showmore-close-bg"></div>
+    <div class="showmore-dialog">
+      <button class="lightbox-close" id="showmore-close" aria-label="Close">✕</button>
+      <div class="showmore-head">
+        <span class="sm-tag">ALL ITEMS</span>
+        <h2 id="showmore-title">ALL DASHBOARDS</h2>
+      </div>
+      <div class="showmore-body" id="showmore-body"></div>
+    </div>
+  </div>
+
+  <script src="supabase-config.js?v=16"></script>
+  <script src="data.js?v=16"></script>
+  <script src="script.js?v=16"></script>
 </body>
 </html>
