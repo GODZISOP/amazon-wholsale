@@ -3,12 +3,12 @@
  */
 window.PORTFOLIO_DATA = {
   profile: {
-    mastheadTitle: "USA FAST SERVICE",
-    role: "USA Fast Service • Working With USA Clients Since 2016",
+    mastheadTitle: "AMAZON FAST SERVICE",
+    role: "Amazon Fast Service • Working With USA Clients Since 2016",
     aboutText:
-      "At USA Fast Service, we work with USA clients since 2016—managing 20+ authorized Amazon seller accounts, 100+ authorized brands, Amazon Ads, and daily FBA & FBM orders.",
+      "At Amazon Fast Service, we work with USA clients since 2016—managing 20+ authorized Amazon seller accounts, 100+ authorized brands, Amazon Ads, and daily FBA & FBM orders.",
     ctaDescription:
-      "USA Fast Service — working with USA clients since 2016. All sales dashboards, ad campaigns, product photos, 100+ authorized brands, and 20+ authorized seller accounts in this book are real work."
+      "Amazon Fast Service — working with USA clients since 2016. All sales dashboards, ad campaigns, product photos, 100+ authorized brands, and 20+ authorized seller accounts in this book are real work."
   },
 
   services: [
@@ -181,7 +181,7 @@ window.PORTFOLIO_DATA = {
     src: "assets/ssstik.io_1795001152321.mp4"
   },
 
-  /**
+  /**mmmm m mmmmm 
    * Real Warehouse & FBA Inventory Photos
    */
   inventory: [

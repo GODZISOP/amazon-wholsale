@@ -749,8 +749,8 @@
       const saved = localStorage.getItem("amz_portfolio_data");
       if (saved) {
         base = Object.assign({}, base, JSON.parse(saved));
-        if (base.profile && base.profile.mastheadTitle === "AMZ WORK") {
-          base.profile.mastheadTitle = "USA FAST SERVICE";
+        if (base.profile && (base.profile.mastheadTitle === "AMZ WORK" || base.profile.mastheadTitle === "USA FAST SERVICE")) {
+          base.profile.mastheadTitle = "AMAZON FAST SERVICE";
         }
       }
     } catch (_) {}
