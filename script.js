@@ -1,6 +1,5 @@
 (function () {
-  const data = window.PORTFOLIO_DATA;
-  if (!data) return;
+  if (!window.PORTFOLIO_DATA) return;
 
   const spreadEl = document.getElementById("book-spread");
   const flipLeaf = document.getElementById("flip-leaf");
@@ -14,7 +13,6 @@
   const mobilePrev = document.getElementById("mobile-prev");
   const mobileNext = document.getElementById("mobile-next");
   const soundToggle = document.getElementById("sound-toggle");
-  const closedBookEl = document.getElementById("closed-book");
   const openBookRim = document.getElementById("open-book-rim");
   const tutorialBar = document.getElementById("tutorial-bar");
   const tutorialToggle = document.getElementById("tutorial-toggle");
@@ -49,7 +47,6 @@
       const buffer = audioCtx.createBuffer(1, length, sampleRate);
       const output = buffer.getChannelData(0);
 
-      // Pink-ish noise for realistic paper texture
       let b0 = 0, b1 = 0, b2 = 0;
       for (let i = 0; i < length; i++) {
         const white = Math.random() * 2 - 1;
@@ -86,9 +83,7 @@
 
       noise.start(now);
       noise.stop(now + duration);
-    } catch (_) {
-      // Ignore audio errors if blocked
-    }
+    } catch (_) {}
   }
 
   if (soundToggle) {
@@ -100,11 +95,14 @@
     });
   }
 
-  // ---------------- SPREAD CONTENT ----------------
-  const kahi = data.selectedWorks[0];
-  const sevenOcean = data.selectedWorks[1];
-  const productsLeft = data.featuredProducts.slice(0, 3);
-  const productsRight = data.featuredProducts.slice(3, 6);
+  // ---------------- HELPERS & AUTO-PAGINATION ENGINE ----------------
+  function chunkArray(arr, size) {
+    const out = [];
+    for (let i = 0; i < (arr || []).length; i += size) {
+      out.push(arr.slice(i, i + size));
+    }
+    return out;
+  }
 
   const renderProductCards = (items) =>
     items
@@ -116,8 +114,8 @@
         </div>
         <div>
           <div class="pb-top">
-            <span class="bb-cat">${p.category}</span>
-            <span class="pb-badge">${p.badge}</span>
+            <span class="bb-cat">${p.category || "Amazon"}</span>
+            <span class="pb-badge">${p.badge || "Featured"}</span>
           </div>
           <div class="pb-brand">${p.brand}</div>
           <p class="pb-title">${p.product}</p>
@@ -133,7 +131,7 @@
       <div class="inv-card" data-lightbox="${item.image}" data-caption="${item.title} — ${item.subtitle}">
         <div class="inv-img-wrap">
           <img src="${item.image}" alt="${item.title}" />
-          <span class="inv-tag">${item.tag}</span>
+          <span class="inv-tag">${item.tag || "STOCK"}</span>
         </div>
         <div class="inv-meta">
           <strong>${item.title}</strong>
@@ -152,7 +150,7 @@
         <h3 class="ads-dash-title">${d.title}</h3>
         <p class="ads-dash-sub">${d.subtitle}</p>
         <div class="ads-dash-stats">
-          ${d.stats
+          ${(d.stats || [])
             .map(
               (s) => `
             <div class="ads-stat-row">
@@ -166,70 +164,24 @@
     </div>
   `;
 
-  const spreads = [
-    {
+  function buildBook(data) {
+    const kahi = (data.selectedWorks && data.selectedWorks[0]) || {};
+    const sevenOcean = (data.selectedWorks && data.selectedWorks[1]) || {};
+
+    const spreads = [];
+
+    // Spread 0: Cover & TOC (TOC items filled after all spreads are built)
+    spreads.push({
       label: "01 Cover",
-      left: `
-        <div class="page page-dark">
-          <div class="page-header">
-            <span>AMAZON PORTFOLIO BOOK</span>
-            <span>US MARKETPLACE</span>
-          </div>
-          <div class="page-body">
-            <h1 class="book-masthead">${data.profile.mastheadTitle}</h1>
-            <div class="cover-hero-wrap">
-              <img src="assets/amazon-service-art.jpg" alt="Amazon Fast Service &amp; Account Specialist" class="cover-img" />
-              <div class="cover-sub">
-                SINCE 2016 • USA<br />
-                FAST SERVICE<br />
-                SELLER CENTRAL<br />
-                AMAZON ADS<br /><br />
-                100+ AUTHORIZED BRANDS<br />
-                20+ AUTHORIZED SELLERS
-              </div>
-            </div>
-            <div class="book-script">Real Accounts &amp; Products.</div>
-          </div>
-          <div class="page-footer">
-            <span>${data.profile.role}</span>
-            <span>P. 01</span>
-          </div>
-        </div>
-      `,
-      right: `
-        <div class="page page-light">
-          <div class="corner-cue"></div>
-          <div class="page-header">
-            <span>WHAT'S INSIDE</span>
-            <span>01 / 09</span>
-          </div>
-          <div class="gold-badge">100+<br />Authorized<br />Brands</div>
-          <div class="page-body">
-            <h2 class="book-big-title">
-              <span class="underline-accent">Amazon</span><br />
-              <span class="highlight-block">Portfolio</span>
-            </h2>
-            <p class="plain-copy">${data.profile.aboutText}</p>
-            <ul class="toc-list">
-              <li class="toc-item" data-jump="1"><strong>02 / MY WORK &amp; KAHI SALES</strong><span>P. 03–04 →</span></li>
-              <li class="toc-item" data-jump="2"><strong>03 / AMAZON ADS AGENT</strong><span>P. 05–06 →</span></li>
-              <li class="toc-item" data-jump="3"><strong>04 / LIVE AD SALES DASHBOARDS</strong><span>P. 07–08 →</span></li>
-              <li class="toc-item" data-jump="4"><strong>05 / REAL PRODUCTS (6)</strong><span>P. 09–10 →</span></li>
-              <li class="toc-item" data-jump="5"><strong>06 / WAREHOUSE &amp; INVENTORY</strong><span>P. 11–12 →</span></li>
-              <li class="toc-item" data-jump="6"><strong>07 / WAREHOUSE VIDEO</strong><span>P. 13–14 →</span></li>
-              <li class="toc-item" data-jump="7"><strong>08 / 100+ BRANDS &amp; 20+ SELLERS</strong><span>P. 15–16 →</span></li>
-              <li class="toc-item" data-jump="8"><strong>09 / SUMMARY &amp; PAGES</strong><span>P. 17–18 →</span></li>
-            </ul>
-          </div>
-          <div class="page-footer">
-            <span>DRAG PAGE OR CLICK TO TURN</span>
-            <span>P. 02</span>
-          </div>
-        </div>
-      `
-    },
-    {
+      tocTitle: null,
+      left: "",
+      right: ""
+    });
+
+    // Spread 1: Services & KAHI Seller Central
+    spreads.push({
       label: "02 Sales",
+      tocTitle: "MY WORK & KAHI SALES",
       left: `
         <div class="page page-dark">
           <div class="page-header">
@@ -239,14 +191,14 @@
           <div class="page-body">
             <h2 class="book-big-title">Account &amp;<br />Ads Work</h2>
             <ul class="book-services">
-              ${data.services.map((s) => `<li><span>${s}</span></li>`).join("")}
+              ${(data.services || []).map((s) => `<li><span>${s}</span></li>`).join("")}
             </ul>
             <ul class="bullet-list" style="color: var(--ink-muted-light); margin-top: 18px;">
-              ${kahi.details.map((d) => `<li>${d}</li>`).join("")}
+              ${(kahi.details || []).map((d) => `<li>${d}</li>`).join("")}
             </ul>
           </div>
           <div class="page-footer">
-            <span>KAHI OFFICIAL • AMAZON USA</span>
+            <span>${kahi.title || "KAHI OFFICIAL"} • AMAZON USA</span>
             <span>P. 03</span>
           </div>
         </div>
@@ -256,17 +208,17 @@
           <div class="corner-cue"></div>
           <div class="page-header">
             <span>LIVE SALES PROOF</span>
-            <span>${kahi.title}</span>
+            <span>${kahi.title || "KAHI OFFICIAL"}</span>
           </div>
           <div class="page-body">
             <div class="proof-shot-box" data-lightbox="${kahi.image}" data-caption="${kahi.title} — ${kahi.subtitle}">
               <img src="${kahi.image}" alt="${kahi.title} Seller Central" />
               <span class="zoom-tag">CLICK TO ZOOM ↗</span>
             </div>
-            <h3 class="book-big-title" style="font-size: 2rem; margin-bottom: 6px;">${kahi.title}</h3>
-            <p class="plain-copy">${kahi.summary}</p>
+            <h3 class="book-big-title" style="font-size: 2rem; margin-bottom: 6px;">${kahi.title || ""}</h3>
+            <p class="plain-copy">${kahi.summary || ""}</p>
             <div class="metrics-strip">
-              ${kahi.metrics
+              ${(kahi.metrics || [])
                 .map((m) => `<div class="m-cell"><span>${m.label}</span><strong>${m.value}</strong></div>`)
                 .join("")}
             </div>
@@ -277,9 +229,12 @@
           </div>
         </div>
       `
-    },
-    {
+    });
+
+    // Spread 2: Amazon Ads Agent
+    spreads.push({
       label: "03 Ads Agent",
+      tocTitle: "AMAZON ADS AGENT",
       left: `
         <div class="page page-dark">
           <div class="page-header">
@@ -288,17 +243,15 @@
           </div>
           <div class="page-body">
             <div class="book-script" style="font-size: 1.9rem; margin-bottom: 6px;">Sponsored Products</div>
-            <h2 class="book-big-title">${sevenOcean.title}</h2>
-            <p class="plain-copy" style="color: var(--ink-muted-light);">
-              ${sevenOcean.summary}
-            </p>
+            <h2 class="book-big-title">${sevenOcean.title || "MY SEVEN OCEAN LLC"}</h2>
+            <p class="plain-copy" style="color: var(--ink-muted-light);">${sevenOcean.summary || ""}</p>
             <div class="metrics-strip" style="border-color: var(--border-dark);">
-              ${sevenOcean.metrics
+              ${(sevenOcean.metrics || [])
                 .map((m) => `<div class="m-cell"><span>${m.label}</span><strong>${m.value}</strong></div>`)
                 .join("")}
             </div>
             <ul class="bullet-list" style="color: var(--ink-muted-light);">
-              ${sevenOcean.details.map((d) => `<li>${d}</li>`).join("")}
+              ${(sevenOcean.details || []).map((d) => `<li>${d}</li>`).join("")}
             </ul>
           </div>
           <div class="page-footer">
@@ -320,7 +273,7 @@
               <span class="zoom-tag">CLICK TO ZOOM ↗</span>
             </div>
             <h3 class="book-big-title" style="font-size: 1.8rem;">
-              <span class="highlight-block">MY SEVEN OCEAN LLC</span>
+              <span class="highlight-block">${sevenOcean.title || "MY SEVEN OCEAN LLC"}</span>
             </h3>
             <p class="plain-copy">
               Sponsored Products campaign launched for 1 advertised product across Amazon and beyond with $70.00 daily budget and $0.20 default bid.
@@ -332,248 +285,312 @@
           </div>
         </div>
       `
-    },
-    {
-      label: "04 Ad Sales",
-      left: `
-        <div class="page page-dark">
-          <div class="page-header">
-            <span>LIVE AD SALES PROOF</span>
-            <span>CLICK TO ZOOM</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 1.9rem; margin-bottom: 6px;">Ad Sales Dashboards</h2>
-            <div class="ads-dash-stack">
-              ${renderAdsDashCard(data.adDashboards[0])}
-              ${renderAdsDashCard(data.adDashboards[1])}
-            </div>
-          </div>
-          <div class="page-footer">
-            <span>SPONSORED PRODUCTS SALES</span>
-            <span>P. 07</span>
-          </div>
-        </div>
-      `,
-      right: `
-        <div class="page page-light">
-          <div class="corner-cue"></div>
-          <div class="page-header">
-            <span>ACCOUNT &amp; PAYMENTS</span>
-            <span>CLICK TO ZOOM</span>
-          </div>
-          <div class="page-body">
-            <div class="proof-shot-box" data-lightbox="${data.adDashboards[2].image}" data-caption="${data.adDashboards[2].title} — ${data.adDashboards[2].subtitle}">
-              <img src="${data.adDashboards[2].image}" alt="${data.adDashboards[2].title}" />
+    });
+
+    // Auto-Paginated Ad Sales Dashboards (max 2 per page -> 4 per spread)
+    const adChunks = chunkArray(data.adDashboards || [], 2);
+    for (let i = 0; i < adChunks.length; i += 2) {
+      const leftList = adChunks[i] || [];
+      const rightList = adChunks[i + 1] || [];
+      const pL = String(spreads.length * 2 + 1).padStart(2, "0");
+      const pR = String(spreads.length * 2 + 2).padStart(2, "0");
+
+      const rightHtml =
+        rightList.length === 1 && leftList.length === 2 && adChunks.length === 2
+          ? `
+            <div class="proof-shot-box" data-lightbox="${rightList[0].image}" data-caption="${rightList[0].title} — ${rightList[0].subtitle}">
+              <img src="${rightList[0].image}" alt="${rightList[0].title}" />
               <span class="zoom-tag">CLICK TO ZOOM ↗</span>
             </div>
             <h3 class="book-big-title" style="font-size: 1.85rem; margin-bottom: 6px;">
-              <span class="underline-accent">Global Sales</span> &amp; <span class="highlight-block">Balance</span>
+              <span class="underline-accent">${rightList[0].title}</span>
             </h3>
             <div class="metrics-strip">
-              ${data.adDashboards[2].stats
+              ${(rightList[0].stats || [])
                 .map((s) => `<div class="m-cell"><span>${s.label}</span><strong>${s.value}</strong></div>`)
                 .join("")}
+            </div>`
+          : rightList.length > 0
+          ? `<h2 class="book-big-title" style="font-size: 1.9rem; margin-bottom: 6px;"><span class="underline-accent">More</span> <span class="highlight-block">Dashboards</span></h2>
+             <div class="ads-dash-stack">${rightList.map(renderAdsDashCard).join("")}</div>`
+          : `<h2 class="book-big-title" style="font-size: 1.9rem;">Live Performance</h2>
+             <p class="plain-copy">Click any dashboard on the left page to zoom in and inspect full metrics.</p>`;
+
+      spreads.push({
+        label: i === 0 ? "Ad Sales" : `Ad Sales ${i / 2 + 1}`,
+        tocTitle: i === 0 ? "LIVE AD SALES DASHBOARDS" : null,
+        left: `
+          <div class="page page-dark">
+            <div class="page-header">
+              <span>LIVE AD SALES PROOF</span>
+              <span>CLICK TO ZOOM</span>
+            </div>
+            <div class="page-body">
+              <h2 class="book-big-title" style="font-size: 1.9rem; margin-bottom: 6px;">Ad Sales Dashboards</h2>
+              <div class="ads-dash-stack">${leftList.map(renderAdsDashCard).join("")}</div>
+            </div>
+            <div class="page-footer">
+              <span>SPONSORED PRODUCTS SALES</span>
+              <span>P. ${pL}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>5.0 FEEDBACK • 68.56% FEATURED OFFER</span>
-            <span>P. 08</span>
-          </div>
-        </div>
-      `
-    },
-    {
-      label: "05 Products",
-      left: `
-        <div class="page page-dark">
-          <div class="page-header">
-            <span>REAL PRODUCTS (1–3)</span>
-            <span>CLICK TO ZOOM</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 2rem; margin-bottom: 8px;">Featured<br />Products</h2>
-            <div class="product-book-grid">
-              ${renderProductCards(productsLeft)}
+        `,
+        right: `
+          <div class="page page-light">
+            <div class="corner-cue"></div>
+            <div class="page-header">
+              <span>ACCOUNT &amp; PAYMENTS</span>
+              <span>CLICK TO ZOOM</span>
+            </div>
+            <div class="page-body">${rightHtml}</div>
+            <div class="page-footer">
+              <span>5.0 FEEDBACK • HEALTHY STORE</span>
+              <span>P. ${pR}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>IMMUNETI • NUTREE • PEPTIDELABZ</span>
-            <span>P. 07</span>
-          </div>
-        </div>
-      `,
-      right: `
-        <div class="page page-light">
-          <div class="corner-cue"></div>
-          <div class="page-header">
-            <span>REAL PRODUCTS (4–6)</span>
-            <span>CLICK TO ZOOM</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 2rem; margin-bottom: 8px;">
-              <span class="underline-accent">More</span> <span class="highlight-block">Products</span>
-            </h2>
-            <div class="product-book-grid">
-              ${renderProductCards(productsRight)}
+        `
+      });
+    }
+
+    // Auto-Paginated Products (max 3 per page -> 6 per spread)
+    const prodChunks = chunkArray(data.featuredProducts || [], 3);
+    for (let i = 0; i < prodChunks.length; i += 2) {
+      const leftProds = prodChunks[i] || [];
+      const rightProds = prodChunks[i + 1] || [];
+      const pL = String(spreads.length * 2 + 1).padStart(2, "0");
+      const pR = String(spreads.length * 2 + 2).padStart(2, "0");
+
+      spreads.push({
+        label: i === 0 ? "Products" : `Products ${i / 2 + 1}`,
+        tocTitle: i === 0 ? `REAL PRODUCTS (${(data.featuredProducts || []).length})` : null,
+        left: `
+          <div class="page page-dark">
+            <div class="page-header">
+              <span>REAL PRODUCTS</span>
+              <span>CLICK TO ZOOM</span>
+            </div>
+            <div class="page-body">
+              <h2 class="book-big-title" style="font-size: 2rem; margin-bottom: 8px;">Featured<br />Products</h2>
+              <div class="product-book-grid">${renderProductCards(leftProds)}</div>
+            </div>
+            <div class="page-footer">
+              <span>AMAZON USA CATALOG</span>
+              <span>P. ${pL}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>DENSSI • KIRA • BOYZZ ONLY</span>
-            <span>P. 08</span>
-          </div>
-        </div>
-      `
-    },
-    {
-      label: "06 Inventory",
-      left: `
-        <div class="page page-dark">
-          <div class="page-header">
-            <span>REAL WAREHOUSE STOCK</span>
-            <span>CLICK TO ZOOM</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 1.9rem; margin-bottom: 6px;">Warehouse &amp; Stock</h2>
-            <div class="inv-grid">
-              ${renderInvCards(data.inventory.slice(0, 2))}
+        `,
+        right: `
+          <div class="page page-light">
+            <div class="corner-cue"></div>
+            <div class="page-header">
+              <span>REAL PRODUCTS</span>
+              <span>CLICK TO ZOOM</span>
+            </div>
+            <div class="page-body">
+              <h2 class="book-big-title" style="font-size: 2rem; margin-bottom: 8px;">
+                <span class="underline-accent">More</span> <span class="highlight-block">Products</span>
+              </h2>
+              ${
+                rightProds.length > 0
+                  ? `<div class="product-book-grid">${renderProductCards(rightProds)}</div>`
+                  : `<p class="plain-copy">More products can be added anytime from the Admin Panel — new pages will auto-align.</p>`
+              }
+            </div>
+            <div class="page-footer">
+              <span>VERIFIED LISTINGS</span>
+              <span>P. ${pR}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>US WAREHOUSE • PREPROTEIN 18</span>
-            <span>P. 09</span>
-          </div>
-        </div>
-      `,
-      right: `
-        <div class="page page-light">
-          <div class="corner-cue"></div>
-          <div class="page-header">
-            <span>FBA INVENTORY</span>
-            <span>CLICK TO ZOOM</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 1.9rem; margin-bottom: 6px;">
-              <span class="underline-accent">No Sweat</span> <span class="highlight-block">Inventory</span>
-            </h2>
-            <div class="inv-grid">
-              ${renderInvCards(data.inventory.slice(2, 4))}
+        `
+      });
+    }
+
+    // Auto-Paginated Warehouse & Inventory (max 2 per page -> 4 per spread)
+    const invChunks = chunkArray(data.inventory || [], 2);
+    for (let i = 0; i < invChunks.length; i += 2) {
+      const leftInv = invChunks[i] || [];
+      const rightInv = invChunks[i + 1] || [];
+      const pL = String(spreads.length * 2 + 1).padStart(2, "0");
+      const pR = String(spreads.length * 2 + 2).padStart(2, "0");
+
+      spreads.push({
+        label: i === 0 ? "Inventory" : `Inventory ${i / 2 + 1}`,
+        tocTitle: i === 0 ? "WAREHOUSE & INVENTORY" : null,
+        left: `
+          <div class="page page-dark">
+            <div class="page-header">
+              <span>REAL WAREHOUSE STOCK</span>
+              <span>CLICK TO ZOOM</span>
+            </div>
+            <div class="page-body">
+              <h2 class="book-big-title" style="font-size: 1.9rem; margin-bottom: 6px;">Warehouse &amp; Stock</h2>
+              <div class="inv-grid">${renderInvCards(leftInv)}</div>
+            </div>
+            <div class="page-footer">
+              <span>US WAREHOUSE</span>
+              <span>P. ${pL}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>FNSKU LABELED • FBA READY</span>
-            <span>P. 10</span>
-          </div>
-        </div>
-      `
-    },
-    {
-      label: "07 Video",
-      left: `
-        <div class="page page-dark">
-          <div class="page-header">
-            <span>LIVE VIDEO PROOF</span>
-            <span>WAREHOUSE</span>
-          </div>
-          <div class="page-body">
-            <div class="book-script" style="font-size: 2rem; margin-bottom: 6px;">Real Stock.</div>
-            <h2 class="book-big-title">${data.inventoryVideo.title}</h2>
-            <p class="plain-copy" style="color: var(--ink-muted-light);">
-              Watch the real warehouse &amp; inventory video on the right page. Click play anytime.
-            </p>
-          </div>
-          <div class="page-footer">
-            <span>${data.inventoryVideo.subtitle}</span>
-            <span>P. 13</span>
-          </div>
-        </div>
-      `,
-      right: `
-        <div class="page page-light">
-          <div class="corner-cue"></div>
-          <div class="page-header">
-            <span>VIDEO PLAYER</span>
-            <span>CLICK PLAY</span>
-          </div>
-          <div class="page-body">
-            <div class="video-book-box">
-              <video id="book-video" src="${data.inventoryVideo.src}" muted controls playsinline preload="metadata"></video>
+        `,
+        right: `
+          <div class="page page-light">
+            <div class="corner-cue"></div>
+            <div class="page-header">
+              <span>FBA INVENTORY</span>
+              <span>CLICK TO ZOOM</span>
+            </div>
+            <div class="page-body">
+              <h2 class="book-big-title" style="font-size: 1.9rem; margin-bottom: 6px;">
+                <span class="underline-accent">FBA</span> <span class="highlight-block">Inventory</span>
+              </h2>
+              ${
+                rightInv.length > 0
+                  ? `<div class="inv-grid">${renderInvCards(rightInv)}</div>`
+                  : `<p class="plain-copy">Additional warehouse photos added via Admin Panel will appear here.</p>`
+              }
+            </div>
+            <div class="page-footer">
+              <span>FNSKU LABELED • FBA READY</span>
+              <span>P. ${pR}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>REAL WAREHOUSE FOOTAGE</span>
-            <span>P. 14</span>
-          </div>
-        </div>
-      `
-    },
-    {
-      label: "08 Brands & Sellers",
-      left: `
-        <div class="page page-dark">
-          <div class="page-header">
-            <span>100+ AUTHORIZED BRANDS</span>
-            <span>KEY BRANDS</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 2rem; margin-bottom: 6px;">100+ Authorized Brands</h2>
-            <p class="plain-copy" style="color: var(--ink-muted-light); font-size: 0.78rem; margin-bottom: 10px;">
-              Seller accounts managing 100+ authorized brands, including:
-            </p>
-            <div class="all-brands-pills">
-              ${data.allBrands
-                .map(
-                  (b) => `
-                <div class="ab-pill">
-                  <strong>${b.name}</strong>
-                  <span>${b.category}</span>
-                </div>`
-                )
-                .join("")}
+        `
+      });
+    }
+
+    // Video Spread
+    if (data.inventoryVideo && data.inventoryVideo.src) {
+      const pL = String(spreads.length * 2 + 1).padStart(2, "0");
+      const pR = String(spreads.length * 2 + 2).padStart(2, "0");
+      spreads.push({
+        label: "Video",
+        tocTitle: "WAREHOUSE VIDEO",
+        left: `
+          <div class="page page-dark">
+            <div class="page-header">
+              <span>LIVE VIDEO PROOF</span>
+              <span>WAREHOUSE</span>
+            </div>
+            <div class="page-body">
+              <div class="book-script" style="font-size: 2rem; margin-bottom: 6px;">Real Stock.</div>
+              <h2 class="book-big-title">${data.inventoryVideo.title}</h2>
+              <p class="plain-copy" style="color: var(--ink-muted-light);">
+                Watch the real warehouse &amp; inventory video on the right page. Click play anytime.
+              </p>
+            </div>
+            <div class="page-footer">
+              <span>${data.inventoryVideo.subtitle}</span>
+              <span>P. ${pL}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>100+ AUTHORIZED BRANDS</span>
-            <span>P. 11</span>
-          </div>
-        </div>
-      `,
-      right: `
-        <div class="page page-light">
-          <div class="corner-cue"></div>
-          <div class="page-header">
-            <span>20+ AUTHORIZED SELLERS</span>
-            <span>AMAZON USA</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 2.1rem;">
-              <span class="highlight-block">20+ Authorized</span>
-              <span class="underline-accent">Sellers</span>
-            </h2>
-            <p class="plain-copy">Managed 20+ authorized seller accounts on Amazon USA. Click below to open sample seller pages:</p>
-            <div class="sf-stack">
-              ${data.storefronts
-                .map(
-                  (sf) => `
-                <a class="sf-book-link" href="${sf.url}" target="_blank" rel="noopener noreferrer">
-                  <div>
-                    <span>${sf.label} • ${sf.marketplace}</span>
-                    <strong>${sf.id}</strong>
-                  </div>
-                  <span class="sf-open-pill">OPEN SELLER ↗</span>
-                </a>`
-                )
-                .join("")}
+        `,
+        right: `
+          <div class="page page-light">
+            <div class="corner-cue"></div>
+            <div class="page-header">
+              <span>VIDEO PLAYER</span>
+              <span>CLICK PLAY</span>
+            </div>
+            <div class="page-body">
+              <div class="video-book-box">
+                <video id="book-video" src="${data.inventoryVideo.src}" muted controls playsinline preload="metadata"></video>
+              </div>
+            </div>
+            <div class="page-footer">
+              <span>REAL WAREHOUSE FOOTAGE</span>
+              <span>P. ${pR}</span>
             </div>
           </div>
-          <div class="page-footer">
-            <span>AMAZON USA SELLER LINKS</span>
-            <span>P. 12</span>
+        `
+      });
+    }
+
+    // Auto-Paginated Brands (12 per page) & Sellers (4 per page)
+    const brandChunks = chunkArray(data.allBrands || [], 12);
+    const sellerChunks = chunkArray(data.storefronts || [], 4);
+    const bsCount = Math.max(brandChunks.length, sellerChunks.length, 1);
+
+    for (let i = 0; i < bsCount; i++) {
+      const bList = brandChunks[i] || [];
+      const sList = sellerChunks[i] || [];
+      const pL = String(spreads.length * 2 + 1).padStart(2, "0");
+      const pR = String(spreads.length * 2 + 2).padStart(2, "0");
+
+      spreads.push({
+        label: i === 0 ? "Brands & Sellers" : `Brands ${i + 1}`,
+        tocTitle: i === 0 ? "100+ BRANDS & 20+ SELLERS" : null,
+        left: `
+          <div class="page page-dark">
+            <div class="page-header">
+              <span>100+ AUTHORIZED BRANDS</span>
+              <span>KEY BRANDS</span>
+            </div>
+            <div class="page-body">
+              <h2 class="book-big-title" style="font-size: 2rem; margin-bottom: 6px;">100+ Authorized Brands</h2>
+              <p class="plain-copy" style="color: var(--ink-muted-light); font-size: 0.78rem; margin-bottom: 10px;">
+                Seller accounts managing 100+ authorized brands, including:
+              </p>
+              <div class="all-brands-pills">
+                ${bList
+                  .map(
+                    (b) => `
+                  <div class="ab-pill">
+                    <strong>${b.name}</strong>
+                    <span>${b.category}</span>
+                  </div>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+            <div class="page-footer">
+              <span>100+ AUTHORIZED BRANDS</span>
+              <span>P. ${pL}</span>
+            </div>
           </div>
-        </div>
-      `
-    },
-    {
-      label: "09 Summary",
+        `,
+        right: `
+          <div class="page page-light">
+            <div class="corner-cue"></div>
+            <div class="page-header">
+              <span>20+ AUTHORIZED SELLERS</span>
+              <span>AMAZON USA</span>
+            </div>
+            <div class="page-body">
+              <h2 class="book-big-title" style="font-size: 2.1rem;">
+                <span class="highlight-block">20+ Authorized</span>
+                <span class="underline-accent">Sellers</span>
+              </h2>
+              <p class="plain-copy">Managed 20+ authorized seller accounts on Amazon USA. Click below to open sample seller pages:</p>
+              <div class="sf-stack">
+                ${sList
+                  .map(
+                    (sf) => `
+                  <a class="sf-book-link" href="${sf.url}" target="_blank" rel="noopener noreferrer">
+                    <div>
+                      <span>${sf.label} • ${sf.marketplace}</span>
+                      <strong>${sf.id}</strong>
+                    </div>
+                    <span class="sf-open-pill">OPEN SELLER ↗</span>
+                  </a>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+            <div class="page-footer">
+              <span>AMAZON USA SELLER LINKS</span>
+              <span>P. ${pR}</span>
+            </div>
+          </div>
+        `
+      });
+    }
+
+    // Final Summary Spread
+    const sumPL = String(spreads.length * 2 + 1).padStart(2, "0");
+    const sumPR = String(spreads.length * 2 + 2).padStart(2, "0");
+    spreads.push({
+      label: "Summary",
+      tocTitle: "SUMMARY & PAGES",
       left: `
         <div class="page page-dark">
           <div class="page-header">
@@ -591,42 +608,135 @@
           </div>
           <div class="page-footer">
             <span>${data.profile.role}</span>
-            <span>P. 17</span>
+            <span>P. ${sumPL}</span>
           </div>
         </div>
       `,
-      right: `
-        <div class="page page-light">
-          <div class="page-header">
-            <span>GO TO ANY PAGE</span>
-            <span>09 / 09</span>
-          </div>
-          <div class="page-body">
-            <h2 class="book-big-title" style="font-size: 2.2rem;">
-              <span class="underline-accent">Go To</span><br />
-              <span class="highlight-block">Any Page</span>
-            </h2>
-            <ul class="toc-list" style="margin-top: 12px;">
-              <li class="toc-item" data-jump="0"><strong>↺ COVER &amp; WHAT'S INSIDE</strong><span>P. 01–02</span></li>
-              <li class="toc-item" data-jump="1"><strong>KAHI OFFICIAL SALES</strong><span>P. 03–04</span></li>
-              <li class="toc-item" data-jump="2"><strong>MY SEVEN OCEAN ADS AGENT</strong><span>P. 05–06</span></li>
-              <li class="toc-item" data-jump="3"><strong>LIVE AD SALES DASHBOARDS</strong><span>P. 07–08</span></li>
-              <li class="toc-item" data-jump="4"><strong>6 REAL PRODUCT PHOTOS</strong><span>P. 09–10</span></li>
-              <li class="toc-item" data-jump="5"><strong>WAREHOUSE &amp; INVENTORY</strong><span>P. 11–12</span></li>
-              <li class="toc-item" data-jump="6"><strong>WAREHOUSE VIDEO</strong><span>P. 13–14</span></li>
-              <li class="toc-item" data-jump="7"><strong>100+ BRANDS &amp; 20+ SELLERS</strong><span>P. 15–16</span></li>
-            </ul>
-          </div>
-          <div class="page-footer">
-            <span>AMZ PORTFOLIO BOOK</span>
-            <span>P. 18</span>
-          </div>
-        </div>
-      `
-    }
-  ];
+      right: ""
+    });
 
-  const mobilePages = spreads.flatMap((s, idx) => [
+    // Number top labels 01..N and build dynamic TOC
+    const totalStr = String(spreads.length).padStart(2, "0");
+    spreads.forEach((sp, idx) => {
+      sp.label = `${String(idx + 1).padStart(2, "0")} ${sp.label.replace(/^\d+\s+/, "")}`;
+    });
+
+    const tocEntries = spreads
+      .map((sp, idx) => {
+        if (idx === 0 || !sp.tocTitle) return "";
+        const pA = String(idx * 2 + 1).padStart(2, "0");
+        const pB = String(idx * 2 + 2).padStart(2, "0");
+        const nStr = String(idx + 1).padStart(2, "0");
+        return `<li class="toc-item" data-jump="${idx}"><strong>${nStr} / ${sp.tocTitle}</strong><span>P. ${pA}–${pB} →</span></li>`;
+      })
+      .join("");
+
+    // Fill Spread 0 (Cover & TOC)
+    spreads[0].left = `
+      <div class="page page-dark">
+        <div class="page-header">
+          <span>AMAZON PORTFOLIO BOOK</span>
+          <span>US MARKETPLACE</span>
+        </div>
+        <div class="page-body">
+          <h1 class="book-masthead">${data.profile.mastheadTitle}</h1>
+          <div class="cover-hero-wrap">
+            <img src="assets/amazon-service-art.jpg" alt="Amazon Fast Service &amp; Account Specialist" class="cover-img" />
+            <div class="cover-sub">
+              SINCE 2016 • USA<br />
+              FAST SERVICE<br />
+              SELLER CENTRAL<br />
+              AMAZON ADS<br /><br />
+              100+ AUTHORIZED BRANDS<br />
+              20+ AUTHORIZED SELLERS
+            </div>
+          </div>
+          <div class="book-script">Real Accounts &amp; Products.</div>
+        </div>
+        <div class="page-footer">
+          <span>${data.profile.role}</span>
+          <span>P. 01</span>
+        </div>
+      </div>
+    `;
+
+    spreads[0].right = `
+      <div class="page page-light">
+        <div class="corner-cue"></div>
+        <div class="page-header">
+          <span>WHAT'S INSIDE</span>
+          <span>01 / ${totalStr}</span>
+        </div>
+        <div class="gold-badge">100+<br />Authorized<br />Brands</div>
+        <div class="page-body">
+          <h2 class="book-big-title">
+            <span class="underline-accent">Amazon</span><br />
+            <span class="highlight-block">Portfolio</span>
+          </h2>
+          <p class="plain-copy">${data.profile.aboutText}</p>
+          <ul class="toc-list">${tocEntries}</ul>
+        </div>
+        <div class="page-footer">
+          <span>DRAG PAGE OR CLICK TO TURN</span>
+          <span>P. 02</span>
+        </div>
+      </div>
+    `;
+
+    // Fill Final Summary Right Page
+    const lastIdx = spreads.length - 1;
+    const summaryToc = spreads
+      .map((sp, idx) => {
+        if (idx === lastIdx || !sp.tocTitle) {
+          if (idx === 0) {
+            return `<li class="toc-item" data-jump="0"><strong>↺ COVER &amp; WHAT'S INSIDE</strong><span>P. 01–02</span></li>`;
+          }
+          return "";
+        }
+        const pA = String(idx * 2 + 1).padStart(2, "0");
+        const pB = String(idx * 2 + 2).padStart(2, "0");
+        return `<li class="toc-item" data-jump="${idx}"><strong>${sp.tocTitle}</strong><span>P. ${pA}–${pB}</span></li>`;
+      })
+      .join("");
+
+    spreads[lastIdx].right = `
+      <div class="page page-light">
+        <div class="page-header">
+          <span>GO TO ANY PAGE</span>
+          <span>${totalStr} / ${totalStr}</span>
+        </div>
+        <div class="page-body">
+          <h2 class="book-big-title" style="font-size: 2.1rem;">
+            <span class="underline-accent">Go To</span><br />
+            <span class="highlight-block">Any Page</span>
+          </h2>
+          <ul class="toc-list" style="margin-top: 10px;">${summaryToc}</ul>
+        </div>
+        <div class="page-footer">
+          <span>AMZ PORTFOLIO BOOK</span>
+          <span>P. ${sumPR}</span>
+        </div>
+      </div>
+    `;
+
+    return spreads;
+  }
+
+  // Load local override if saved from Admin Panel
+  function getInitialData() {
+    let base = window.PORTFOLIO_DATA;
+    try {
+      const saved = localStorage.getItem("amz_portfolio_data");
+      if (saved) {
+        base = Object.assign({}, base, JSON.parse(saved));
+      }
+    } catch (_) {}
+    return base;
+  }
+
+  let activeData = getInitialData();
+  let spreads = buildBook(activeData);
+  let mobilePages = spreads.flatMap((s, idx) => [
     { html: s.left, spreadIdx: idx },
     { html: s.right, spreadIdx: idx }
   ]);
@@ -695,7 +805,7 @@
       currentIndex = mp.spreadIdx;
       spreadEl.innerHTML = mp.html;
     } else {
-      const s = spreads[index];
+      const s = spreads[index] || spreads[0];
       if (!s) return;
       currentIndex = index;
       mobilePageIndex = index * 2;
@@ -710,7 +820,7 @@
     const isClosing = targetIndex < 0 || targetIndex >= spreads.length;
     const nxt = isClosing
       ? {
-          left: `<div class="page page-dark"><div class="page-body" style="align-items:center;text-align:center;"><h2 class="book-masthead">AMZ WORK</h2><div class="book-script">Closing Book...</div></div></div>`,
+          left: `<div class="page page-dark"><div class="page-body" style="align-items:center;text-align:center;"><h2 class="book-masthead">${activeData.profile.mastheadTitle}</h2><div class="book-script">Closing Book...</div></div></div>`,
           right: `<div class="page page-dark" style="opacity:0.25;"></div>`
         }
       : spreads[targetIndex];
@@ -820,7 +930,7 @@
 
     playPageSound("flip");
 
-    if (!flipLeaf || reducedMotion || window.innerWidth <= 960) {
+    if (!flipLeaf || reducedMotion) {
       currentIndex = targetIndex;
       renderSpread(currentIndex);
       return;
@@ -837,7 +947,7 @@
     }, 430);
   }
 
-  // ---------------- REAL-TIME GRAB & HOLD PAGE CURL (ANYWHERE ON PAGE) ----------------
+  // ---------------- REAL-TIME GRAB & HOLD PAGE CURL ----------------
   let dragState = null;
   let suppressNextClick = false;
 
@@ -848,18 +958,16 @@
   spreadEl?.addEventListener("pointerdown", (e) => {
     if (isAnimating) return;
 
-    // On mobile when closed, tap opens the book
-    if (!isBookOpen && window.innerWidth <= 960) {
+    if (!isBookOpen && isMobile()) {
       openBook(0);
       return;
     }
 
-    if (window.innerWidth <= 960 || isHardInteractive(e.target)) return;
+    if (isMobile() || isHardInteractive(e.target)) return;
 
     const rect = spreadEl.getBoundingClientRect();
     const relX = (e.clientX - rect.left) / rect.width;
 
-    // When book is closed on desktop, dragging/clicking anywhere on the cover opens it
     if (!isBookOpen) {
       if (relX < 0.45) return;
       dragState = {
@@ -931,13 +1039,11 @@
     dragState = null;
     spreadEl?.classList.remove("is-grabbing");
 
-    // Simple click on closed cover opens the book
     if (state.direction === "open-cover" && !state.active) {
       openBook(0);
       return;
     }
 
-    // Simple click on an open page flips to next/prev (unless clicking zoom/jump/link)
     if (!state.active) {
       if (!e.target.closest("a, button, video, [data-lightbox], [data-jump]")) {
         goToSpread(state.targetIndex);
@@ -945,7 +1051,6 @@
       return;
     }
 
-    // Prevent accidental lightbox/jump click after dragging
     suppressNextClick = true;
     setTimeout(() => {
       suppressNextClick = false;
@@ -1027,7 +1132,7 @@
     if (e.key === "ArrowLeft") goToSpread(currentIndex - 1);
   });
 
-  // Mobile swipe & tap-to-flip (1-page-at-a-time 3D flip)
+  // Mobile swipe & tap-to-flip
   let touchStartX = 0;
   let touchStartY = 0;
   spreadEl?.addEventListener(
@@ -1059,12 +1164,10 @@
           openBook(0);
           return;
         }
-        if (!e.target.closest("[data-lightbox], [data-jump]")) {
-          const rect = spreadEl.getBoundingClientRect();
-          const relX = (e.changedTouches[0].clientX - rect.left) / rect.width;
-          if (relX < 0.35) goToMobilePage(mobilePageIndex - 1);
-          else goToMobilePage(mobilePageIndex + 1);
-        }
+        const rect = spreadEl.getBoundingClientRect();
+        const relX = (e.changedTouches[0].clientX - rect.left) / rect.width;
+        if (relX < 0.35) goToMobilePage(mobilePageIndex - 1);
+        else goToMobilePage(mobilePageIndex + 1);
       }
     },
     { passive: true }
@@ -1111,36 +1214,39 @@
     if (e.key === "Escape") closeLightbox();
   });
 
-  const frontCoverHtml = `
-    <div class="front-cover-face">
-      <div class="page-header" style="color: #C6C0B8; border-color: rgba(245,243,238,0.2);">
-        <span>AMAZON PORTFOLIO BOOK</span>
-        <span>USA SINCE 2016</span>
+  function getFrontCoverHtml() {
+    return `
+      <div class="front-cover-face">
+        <div class="page-header" style="color: #C6C0B8; border-color: rgba(245,243,238,0.2);">
+          <span>AMAZON PORTFOLIO BOOK</span>
+          <span>USA SINCE 2016</span>
+        </div>
+        <div class="closed-cover-center">
+          <h1 class="book-masthead" style="color: #F5F3EE;">${activeData.profile.mastheadTitle}</h1>
+          <img src="assets/amazon-service-art.jpg" alt="Amazon Fast Service Cover" class="closed-hero-img" />
+          <div class="book-script" style="font-size: 2rem;">Fast Service. Real Results.</div>
+        </div>
+        <div class="closed-open-prompt">
+          <span>DRAG OR CLICK COVER TO OPEN →</span>
+        </div>
       </div>
-      <div class="closed-cover-center">
-        <h1 class="book-masthead" style="color: #F5F3EE;">AMZ WORK</h1>
-        <img src="assets/amazon-service-art.jpg" alt="Amazon Fast Service Cover" class="closed-hero-img" />
-        <div class="book-script" style="font-size: 2rem;">Fast Service. Real Results.</div>
-      </div>
-      <div class="closed-open-prompt">
-        <span>DRAG OR CLICK COVER TO OPEN →</span>
-      </div>
-    </div>
-  `;
+    `;
+  }
 
   function showClosedState() {
     isBookOpen = false;
     isAnimating = false;
+    mobilePageIndex = 0;
     if (openBookRim) openBookRim.classList.add("is-closed");
     if (spreadEl) spreadEl.innerHTML = spreads[0].left + spreads[0].right;
-    if (flipLeaf && flipFront && flipBack && window.innerWidth > 960) {
+    if (flipLeaf && flipFront && flipBack && !isMobile()) {
       flipLeaf.classList.remove("dir-prev", "smooth-snap");
-      flipFront.innerHTML = frontCoverHtml;
+      flipFront.innerHTML = getFrontCoverHtml();
       flipBack.innerHTML = spreads[0].left;
       flipLeaf.style.transform = "rotateY(0deg)";
       flipLeaf.classList.add("active");
     } else if (spreadEl) {
-      spreadEl.innerHTML = frontCoverHtml;
+      spreadEl.innerHTML = getFrontCoverHtml();
     }
     renderNav();
   }
@@ -1149,10 +1255,11 @@
     if (isBookOpen || isAnimating) return;
     playPageSound("flip");
 
-    if (!flipLeaf || window.innerWidth <= 960) {
+    if (!flipLeaf || isMobile()) {
       isBookOpen = true;
       if (openBookRim) openBookRim.classList.remove("is-closed");
       currentIndex = targetIndex;
+      mobilePageIndex = targetIndex * 2;
       renderSpread(currentIndex);
       return;
     }
@@ -1182,15 +1289,43 @@
 
   // Tutorial Guide Controls
   if (tutClose && tutorialBar) {
-    tutClose.addEventListener("click", () => {
-      tutorialBar.classList.add("is-hidden");
-    });
+    tutClose.addEventListener("click", () => tutorialBar.classList.add("is-hidden"));
   }
   if (tutorialToggle && tutorialBar) {
-    tutorialToggle.addEventListener("click", () => {
-      tutorialBar.classList.toggle("is-hidden");
-    });
+    tutorialToggle.addEventListener("click", () => tutorialBar.classList.toggle("is-hidden"));
+  }
+
+  // Sync from Supabase if configured
+  async function syncFromSupabase() {
+    let cfg = window.SUPABASE_CONFIG || {};
+    try {
+      const localCfg = localStorage.getItem("amz_supabase_config");
+      if (localCfg) cfg = Object.assign({}, cfg, JSON.parse(localCfg));
+    } catch (_) {}
+
+    if (!cfg.url || !cfg.anonKey) return;
+    try {
+      const endpoint = `${cfg.url.replace(/\/$/, "")}/rest/v1/${cfg.table || "portfolio_config"}?id=eq.${cfg.rowId || "main"}&select=data`;
+      const res = await fetch(endpoint, {
+        headers: window.getSupabaseHeaders
+          ? window.getSupabaseHeaders(cfg.anonKey)
+          : { apikey: cfg.anonKey }
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (rows && rows[0] && rows[0].data) {
+        activeData = Object.assign({}, window.PORTFOLIO_DATA, rows[0].data);
+        spreads = buildBook(activeData);
+        mobilePages = spreads.flatMap((s, idx) => [
+          { html: s.left, spreadIdx: idx },
+          { html: s.right, spreadIdx: idx }
+        ]);
+        if (!isBookOpen) showClosedState();
+        else renderSpread(Math.min(currentIndex, spreads.length - 1));
+      }
+    } catch (_) {}
   }
 
   showClosedState();
+  syncFromSupabase();
 })();

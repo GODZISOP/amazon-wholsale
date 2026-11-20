@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMZ WORK — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="admin.css?v=1" />
+</head>
+<body>
+  <!-- PIN LOCK SCREEN -->
+  <div class="pin-overlay" id="pin-overlay">
+    <div class="pin-card">
+      <div class="pin-badge">ADMIN ACCESS</div>
+      <h1>AMZ WORK ADMIN</h1>
+      <p>Enter your Admin PIN to edit your portfolio book. (Default PIN: <strong>1234</strong>)</p>
+      <form id="pin-form">
+        <input type="password" id="pin-input" placeholder="Enter PIN" autocomplete="off" required />
+        <button type="submit" class="btn-red">UNLOCK ADMIN →</button>
+      </form>
+      <p class="pin-error" id="pin-error"></p>
+      <a href="index.html" class="back-link">← Back to Portfolio Book</a>
+    </div>
+  </div>
+
+  <!-- ADMIN SHELL -->
+  <div class="admin-shell is-hidden" id="admin-shell">
+    <header class="admin-header">
+      <div class="ah-left">
+        <span class="dot-red"></span>
+        <strong>AMZ PORTFOLIO ADMIN</strong>
+        <span class="sync-pill" id="sync-status">LOCAL MODE</span>
+      </div>
+      <div class="ah-actions">
+        <a href="index.html" target="_blank" class="btn-outline-light">VIEW BOOK ↗</a>
+        <button id="save-all-btn" class="btn-red">SAVE &amp; PUBLISH</button>
+      </div>
+    </header>
+
+    <div class="admin-body">
+      <aside class="admin-sidebar" id="admin-tabs">
+        <button class="tab-btn active" data-tab="profile">01 / Profile &amp; Work</button>
+        <button class="tab-btn" data-tab="ads">02 / Sales &amp; Ads</button>
+        <button class="tab-btn" data-tab="products">03 / Products</button>
+        <button class="tab-btn" data-tab="inventory">04 / Inventory &amp; Video</button>
+        <button class="tab-btn" data-tab="brands">05 / Brands &amp; Sellers</button>
+        <button class="tab-btn" data-tab="supabase">06 / Supabase &amp; Settings</button>
+      </aside>
+
+      <main class="admin-main">
+        <div class="toast" id="toast" role="status"></div>
+
+        <!-- TAB 1: PROFILE & SERVICES -->
+        <section class="tab-panel active" id="tab-profile">
+          <div class="panel-head">
+            <h2>Profile &amp; Work</h2>
+            <span class="cap-badge">Cover &amp; P. 01–03</span>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              <span>Book Title (Masthead)</span>
+              <input type="text" id="p-masthead" />
+            </label>
+            <label>
+              <span>Role / Tagline</span>
+              <input type="text" id="p-role" />
+            </label>
+          </div>
+
+          <label class="full-field">
+            <span>About Text (Page 02)</span>
+            <textarea id="p-about" rows="3"></textarea>
+          </label>
+
+          <label class="full-field">
+            <span>Summary Text (Last Spread)</span>
+            <textarea id="p-cta" rows="3"></textarea>
+          </label>
+
+          <div class="sub-head">
+            <h3>My Work / Services (1 per line, max 6 recommended)</h3>
+          </div>
+          <textarea id="p-services" rows="6" class="mono-area"></textarea>
+        </section>
+
+        <!-- TAB 2: SALES & ADS -->
+        <section class="tab-panel" id="tab-ads">
+          <div class="panel-head">
+            <h2>Ad Sales Dashboards</h2>
+            <span class="cap-badge" id="cap-ads">2 per page • Auto-paginates</span>
+          </div>
+          <p class="hint-text">
+            Each book page fits <strong>2 dashboard cards</strong> cleanly. Adding more automatically creates new pages without breaking alignment.
+          </p>
+          <div id="ads-list" class="item-list"></div>
+          <button class="btn-dark" id="add-ad-btn">+ ADD AD DASHBOARD</button>
+        </section>
+
+        <!-- TAB 3: PRODUCTS -->
+        <section class="tab-panel" id="tab-products">
+          <div class="panel-head">
+            <h2>Real Products</h2>
+            <span class="cap-badge" id="cap-products">3 per page • Auto-paginates</span>
+          </div>
+          <p class="hint-text">
+            Each book page fits <strong>3 product cards</strong> (6 per 2-page spread). Adding 7+ products automatically creates a new spread.
+          </p>
+          <div id="products-list" class="item-list"></div>
+          <button class="btn-dark" id="add-product-btn">+ ADD PRODUCT</button>
+        </section>
+
+        <!-- TAB 4: INVENTORY & VIDEO -->
+        <section class="tab-panel" id="tab-inventory">
+          <div class="panel-head">
+            <h2>Warehouse &amp; Inventory</h2>
+            <span class="cap-badge" id="cap-inventory">2 per page • Auto-paginates</span>
+          </div>
+          <p class="hint-text">
+            Each book page fits <strong>2 warehouse/inventory photos</strong> cleanly. Extra photos auto-create new pages.
+          </p>
+          <div id="inventory-list" class="item-list"></div>
+          <button class="btn-dark" id="add-inv-btn">+ ADD INVENTORY PHOTO</button>
+
+          <hr class="divider" />
+          <div class="panel-head">
+            <h2>Warehouse Video</h2>
+            <span class="cap-badge">Muted Video Spread</span>
+          </div>
+          <div class="form-grid">
+            <label>
+              <span>Video Title</span>
+              <input type="text" id="v-title" />
+            </label>
+            <label>
+              <span>Video Subtitle</span>
+              <input type="text" id="v-subtitle" />
+            </label>
+          </div>
+          <label class="full-field">
+            <span>Video Path or URL</span>
+            <div class="upload-row">
+              <input type="text" id="v-src" />
+              <label class="btn-outline-dark upload-btn">
+                UPLOAD MP4
+                <input type="file" id="v-file" accept="video/*" hidden />
+              </label>
+            </div>
+          </label>
+        </section>
+
+        <!-- TAB 5: BRANDS & SELLERS -->
+        <section class="tab-panel" id="tab-brands">
+          <div class="panel-head">
+            <h2>Brands List</h2>
+            <span class="cap-badge" id="cap-brands">12 per page • Auto-paginates</span>
+          </div>
+          <div id="brands-list" class="compact-list"></div>
+          <button class="btn-dark" id="add-brand-btn">+ ADD BRAND</button>
+
+          <hr class="divider" />
+          <div class="panel-head">
+            <h2>Authorized Sellers (Amazon Links)</h2>
+            <span class="cap-badge" id="cap-sellers">4 per page • Auto-paginates</span>
+          </div>
+          <div id="sellers-list" class="item-list"></div>
+          <button class="btn-dark" id="add-seller-btn">+ ADD SELLER LINK</button>
+        </section>
+
+        <!-- TAB 6: SUPABASE & SETTINGS -->
+        <section class="tab-panel" id="tab-supabase">
+          <div class="panel-head">
+            <h2>Supabase Cloud Sync</h2>
+            <span class="cap-badge" id="sb-conn-badge">NOT CONNECTED</span>
+          </div>
+          <p class="hint-text">
+            Connect your Supabase project so any edits or uploaded images/videos from this Admin Panel go live for all visitors automatically.
+          </p>
+
+          <div class="form-grid">
+            <label>
+              <span>Supabase Project URL</span>
+              <input type="url" id="sb-url" placeholder="https://xxxxx.supabase.co" />
+            </label>
+            <label>
+              <span>Supabase Anon Key</span>
+              <input type="text" id="sb-key" placeholder="eyJhbGciOi..." />
+            </label>
+          </div>
+          <div class="form-grid">
+            <label>
+              <span>Table Name</span>
+              <input type="text" id="sb-table" value="portfolio_config" />
+            </label>
+            <label>
+              <span>Storage Bucket (Public)</span>
+              <input type="text" id="sb-bucket" value="portfolio-assets" />
+            </label>
+          </div>
+          <div class="btn-row">
+            <button class="btn-red" id="sb-save-btn">SAVE &amp; TEST SUPABASE</button>
+            <button class="btn-outline-dark" id="copy-sql-btn">COPY SQL SETUP</button>
+          </div>
+
+          <pre class="sql-box" id="sql-box">-- Run once in Supabase SQL Editor:
+create table if not exists portfolio_config (
+  id text primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+alter table portfolio_config enable row level security;
+create policy "Public read" on portfolio_config for select using (true);
+create policy "Public upsert" on portfolio_config for all using (true) with check (true);
+-- Also create a Public Storage bucket named: portfolio-assets</pre>
+
+          <hr class="divider" />
+          <div class="panel-head">
+            <h2>Security &amp; Backup</h2>
+          </div>
+          <div class="form-grid">
+            <label>
+              <span>Change Admin PIN</span>
+              <input type="text" id="new-pin" placeholder="New PIN (e.g. 4321)" />
+            </label>
+            <div class="btn-row" style="align-items: end;">
+              <button class="btn-dark" id="save-pin-btn">UPDATE PIN</button>
+              <button class="btn-outline-dark" id="export-js-btn">EXPORT data.js</button>
+              <button class="btn-outline-dark danger" id="reset-btn">RESET DEFAULT</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="supabase-config.js?v=1"></script>
+  <script src="data.js?v=15"></script>
+  <script src="admin.js?v=1"></script>
+</body>
+</html>
