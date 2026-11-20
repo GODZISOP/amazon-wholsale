@@ -34,10 +34,9 @@
   }
 
   // ---------------- PIN LOCK ----------------
-  const savedPin = localStorage.getItem(PIN_KEY) || "1234";
   pinForm?.addEventListener("submit", (e) => {
     e.preventDefault();
-    if (pinInput.value.trim() === (localStorage.getItem(PIN_KEY) || "1234")) {
+    if (pinInput.value.trim() === (localStorage.getItem(PIN_KEY) || "0005")) {
       pinOverlay.classList.add("is-hidden");
       adminShell.classList.remove("is-hidden");
       initAdmin();
