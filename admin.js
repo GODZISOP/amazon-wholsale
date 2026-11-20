@@ -213,9 +213,10 @@
               <label class="btn-outline-dark upload-btn">UPLOAD<input type="file" accept="image/*" data-ad-upload="${idx}" hidden /></label>
             </div>
           </label>
-          <div class="form-grid">
-            <label><span>Stat 1 Label / Value</span><input type="text" data-ad-stat="0" value="${(st[0]?.label || "") + " | " + (st[0]?.value || "")}" /></label>
-            <label><span>Stat 2 Label / Value</span><input type="text" data-ad-stat="1" value="${(st[1]?.label || "") + " | " + (st[1]?.value || "")}" /></label>
+          <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <label><span>Stat 1 (Label | Value)</span><input type="text" data-ad-stat="0" value="${(st[0]?.label || "") + " | " + (st[0]?.value || "")}" /></label>
+            <label><span>Stat 2 (Label | Value)</span><input type="text" data-ad-stat="1" value="${(st[1]?.label || "") + " | " + (st[1]?.value || "")}" /></label>
+            <label><span>Stat 3 (Label | Value)</span><input type="text" data-ad-stat="2" value="${(st[2]?.label || "") + " | " + (st[2]?.value || "")}" /></label>
           </div>
         </div>`;
       })
@@ -382,11 +383,15 @@
       d.title = card.querySelector('[data-ad-field="title"]').value.trim();
       d.subtitle = card.querySelector('[data-ad-field="subtitle"]').value.trim();
       d.image = card.querySelector('[data-ad-field="image"]').value.trim();
-      [0, 1].forEach((si) => {
-        const raw = card.querySelector(`[data-ad-stat="${si}"]`).value;
+      d.stats = [];
+      [0, 1, 2].forEach((si) => {
+        const el = card.querySelector(`[data-ad-stat="${si}"]`);
+        if (!el) return;
+        const raw = el.value;
         const parts = raw.split("|").map((x) => x.trim());
-        d.stats = d.stats || [];
-        d.stats[si] = { label: parts[0] || "Stat", value: parts[1] || "" };
+        if (parts[0] || parts[1]) {
+          d.stats.push({ label: parts[0] || "Stat", value: parts[1] || "" });
+        }
       });
     });
 
@@ -439,7 +444,11 @@
         title: "New Dashboard",
         subtitle: "Amazon USA",
         image: "assets/image copy 4.png",
-        stats: [{ label: "Sales", value: "$0" }, { label: "Ad Sales", value: "$0" }]
+        stats: [
+          { label: "Total Sales", value: "$0" },
+          { label: "Ad Sales (7D)", value: "$0" },
+          { label: "Units Sold", value: "0" }
+        ]
       });
       renderAds();
       updateCapacities();
