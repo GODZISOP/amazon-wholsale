@@ -180,6 +180,7 @@
             <div class="cover-hero-wrap">
               <img src="assets/amazon-service-art.jpg" alt="Amazon Fast Service &amp; Account Specialist" class="cover-img" />
               <div class="cover-sub">
+                SINCE 2016 • USA<br />
                 FAST SERVICE<br />
                 SELLER CENTRAL<br />
                 AMAZON ADS<br /><br />
@@ -583,7 +584,7 @@
             <h2 class="book-masthead" style="font-size: clamp(2.6rem, 4.4vw, 3.8rem);">
               REAL WORK.<br />REAL BRANDS.
             </h2>
-            <div class="book-script" style="font-size: 3rem; margin-top: 8px;">Amazon USA.</div>
+            <div class="book-script" style="font-size: 2.6rem; margin-top: 8px;">Amazon USA • Since 2016.</div>
             <p class="plain-copy" style="color: var(--ink-muted-light); margin-top: 16px;">
               ${data.profile.ctaDescription}
             </p>
@@ -1114,7 +1115,7 @@
     <div class="front-cover-face">
       <div class="page-header" style="color: #C6C0B8; border-color: rgba(245,243,238,0.2);">
         <span>AMAZON PORTFOLIO BOOK</span>
-        <span>100+ BRANDS • 20+ SELLERS</span>
+        <span>USA SINCE 2016</span>
       </div>
       <div class="closed-cover-center">
         <h1 class="book-masthead" style="color: #F5F3EE;">AMZ WORK</h1>
