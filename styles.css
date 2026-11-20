@@ -411,8 +411,8 @@ body {
 /* ---------------- TYPOGRAPHY & BLOCKS ---------------- */
 .book-masthead {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 5.2vw, 4.6rem);
-  line-height: 0.9;
+  font-size: clamp(2.2rem, 3.8vw, 3.3rem);
+  line-height: 0.94;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   margin: 0;

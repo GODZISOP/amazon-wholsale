@@ -3,12 +3,12 @@
  */
 window.PORTFOLIO_DATA = {
   profile: {
-    mastheadTitle: "AMZ WORK",
-    role: "Amazon Fast Service • USA Clients Since 2016",
+    mastheadTitle: "USA FAST SERVICE",
+    role: "USA Fast Service • Working With USA Clients Since 2016",
     aboutText:
-      "Providing fast Amazon services to USA clients since 2016. I manage 20+ authorized Amazon seller accounts and 100+ authorized brands, run Amazon Ads, handle daily FBA & FBM orders, and grow sales.",
+      "At USA Fast Service, we work with USA clients since 2016—managing 20+ authorized Amazon seller accounts, 100+ authorized brands, Amazon Ads, and daily FBA & FBM orders.",
     ctaDescription:
-      "Providing fast Amazon services to USA clients since 2016. All sales dashboards, ad campaigns, product photos, 100+ authorized brands, and 20+ authorized seller accounts in this book are real work."
+      "USA Fast Service — working with USA clients since 2016. All sales dashboards, ad campaigns, product photos, 100+ authorized brands, and 20+ authorized seller accounts in this book are real work."
   },
 
   services: [
