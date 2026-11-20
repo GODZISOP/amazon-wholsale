@@ -214,9 +214,22 @@ create table if not exists portfolio_config (
   updated_at timestamptz default now()
 );
 alter table portfolio_config enable row level security;
+drop policy if exists "Public read" on portfolio_config;
+drop policy if exists "Public upsert" on portfolio_config;
 create policy "Public read" on portfolio_config for select using (true);
 create policy "Public upsert" on portfolio_config for all using (true) with check (true);
--- Also create a Public Storage bucket named: portfolio-assets</pre>
+
+-- Storage bucket + upload permissions:
+insert into storage.buckets (id, name, public)
+values ('portfolio-assets', 'portfolio-assets', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Public bucket read" on storage.objects;
+drop policy if exists "Public bucket upload" on storage.objects;
+drop policy if exists "Public bucket update" on storage.objects;
+create policy "Public bucket read" on storage.objects for select using (bucket_id = 'portfolio-assets');
+create policy "Public bucket upload" on storage.objects for insert with check (bucket_id = 'portfolio-assets');
+create policy "Public bucket update" on storage.objects for update using (bucket_id = 'portfolio-assets');</pre>
 
           <hr class="divider" />
           <div class="panel-head">
@@ -243,3 +256,4 @@ create policy "Public upsert" on portfolio_config for all using (true) with chec
   <script src="admin.js?v=1"></script>
 </body>
 </html>
+

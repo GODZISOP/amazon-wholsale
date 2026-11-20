@@ -83,7 +83,12 @@
     });
 
     if (!res.ok) {
-      throw new Error("Supabase upload failed — check bucket permissions.");
+      let detail = `HTTP ${res.status}`;
+      try {
+        const errJson = await res.json();
+        if (errJson.message || errJson.error) detail = errJson.message || errJson.error;
+      } catch (_) {}
+      throw new Error(`Upload failed (${detail}) — Run the SQL Setup in Tab 06.`);
     }
     return `${base}/storage/v1/object/public/${bucket}/${cleanName}`;
   }
