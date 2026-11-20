@@ -664,7 +664,7 @@
           <div class="cover-hero-wrap">
             <img src="assets/amazon-service-art.jpg" alt="Amazon Fast Service &amp; Account Specialist" class="cover-img" />
             <div class="cover-sub">
-              USA FAST SERVICE<br />
+              AMAZON FAST SERVICE<br />
               FOR USA CLIENTS<br />
               SINCE 2016<br /><br />
               100+ AUTHORIZED BRANDS<br />
