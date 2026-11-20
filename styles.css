@@ -298,7 +298,7 @@ body {
 }
 
 .flip-leaf.smooth-snap {
-  transition: transform 0.42s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.32s cubic-bezier(0.22, 0.85, 0.3, 1);
 }
 
 .flip-face {

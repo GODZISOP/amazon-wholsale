@@ -664,10 +664,9 @@
           <div class="cover-hero-wrap">
             <img src="assets/amazon-service-art.jpg" alt="Amazon Fast Service &amp; Account Specialist" class="cover-img" />
             <div class="cover-sub">
-              SINCE 2016 • USA<br />
-              FAST SERVICE<br />
-              SELLER CENTRAL<br />
-              AMAZON ADS<br /><br />
+              USA FAST SERVICE<br />
+              FOR USA CLIENTS<br />
+              SINCE 2016<br /><br />
               100+ AUTHORIZED BRANDS<br />
               20+ AUTHORIZED SELLERS
             </div>
@@ -755,7 +754,21 @@
     return base;
   }
 
+  function preloadBookImages(data) {
+    const urls = new Set(["assets/amazon-service-art.jpg"]);
+    (data.selectedWorks || []).forEach((w) => w.image && urls.add(w.image));
+    (data.adDashboards || []).forEach((d) => d.image && urls.add(d.image));
+    (data.featuredProducts || []).forEach((p) => p.image && urls.add(p.image));
+    (data.inventory || []).forEach((i) => i.image && urls.add(i.image));
+    urls.forEach((src) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+    });
+  }
+
   let activeData = getInitialData();
+  preloadBookImages(activeData);
   let spreads = buildBook(activeData);
   let mobilePages = spreads.flatMap((s, idx) => [
     { html: s.left, spreadIdx: idx },
@@ -926,7 +939,7 @@
       flipLeaf.style.transform = "";
       renderSpread(mobilePages[mobilePageIndex].spreadIdx);
       isAnimating = false;
-    }, 420);
+    }, 330);
   }
 
   function goToSpread(targetIndex) {
@@ -965,7 +978,7 @@
 
     setTimeout(() => {
       cleanupLeaf(targetIndex);
-    }, 430);
+    }, 330);
   }
 
   // ---------------- REAL-TIME GRAB & HOLD PAGE CURL ----------------
@@ -1100,7 +1113,7 @@
         } else {
           cleanupLeaf(state.targetIndex);
         }
-      }, 420);
+      }, 330);
     } else {
       flipLeaf.style.transform = "rotateY(0deg)";
       setTimeout(() => {
@@ -1114,7 +1127,7 @@
         } else {
           cleanupLeaf(null);
         }
-      }, 420);
+      }, 330);
     }
   }
 
@@ -1342,7 +1355,7 @@
     setTimeout(() => {
       isBookOpen = true;
       cleanupLeaf(targetIndex);
-    }, 430);
+    }, 330);
   }
 
   function closeBook() {
@@ -1379,6 +1392,7 @@
       const rows = await res.json();
       if (rows && rows[0] && rows[0].data) {
         activeData = Object.assign({}, window.PORTFOLIO_DATA, rows[0].data);
+        preloadBookImages(activeData);
         spreads = buildBook(activeData);
         mobilePages = spreads.flatMap((s, idx) => [
           { html: s.left, spreadIdx: idx },
@@ -1410,6 +1424,7 @@
       const rows = await res.json();
       if (rows && rows[0] && rows[0].data) {
         activeData = Object.assign({}, window.PORTFOLIO_DATA, rows[0].data);
+        preloadBookImages(activeData);
         spreads = buildBook(activeData);
         mobilePages = spreads.flatMap((s, idx) => [
           { html: s.left, spreadIdx: idx },

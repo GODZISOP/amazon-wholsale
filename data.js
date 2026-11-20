@@ -4,11 +4,11 @@
 window.PORTFOLIO_DATA = {
   profile: {
     mastheadTitle: "AMZ WORK",
-    role: "Amazon Account & Ads Manager • USA Since 2016",
+    role: "Amazon Fast Service • USA Clients Since 2016",
     aboutText:
-      "Working in Amazon USA since 2016. I manage 20+ authorized Amazon seller accounts and 100+ authorized brands, run Amazon Ads, handle daily orders (FBA & FBM), and grow sales.",
+      "Providing fast Amazon services to USA clients since 2016. I manage 20+ authorized Amazon seller accounts and 100+ authorized brands, run Amazon Ads, handle daily FBA & FBM orders, and grow sales.",
     ctaDescription:
-      "Working in Amazon USA since 2016. All sales dashboards, ad campaigns, product photos, 100+ authorized brands, and 20+ authorized seller accounts in this book are real work."
+      "Providing fast Amazon services to USA clients since 2016. All sales dashboards, ad campaigns, product photos, 100+ authorized brands, and 20+ authorized seller accounts in this book are real work."
   },
 
   services: [
